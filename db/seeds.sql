@@ -1,47 +1,42 @@
-USE employee_db;
-
-INSERT INTO department (dept_name) 
+INSERT INTO department (name)
 VALUES 
-("Police Department"), 
-("Wayne Enterprises"), 
-("Batcave"), 
-("Gotham City Mayor"), 
-("Parks and Recreation");
+("Justice League"),
+("Suicide Squad"),
+("Teen Titans"),
+("The Outsiders"),
+("The Legion of Doom");
 
-INSERT INTO roles (title, salary, department_id) 
-VALUES 
-("Batman", 1000000, 3), 
-("Commissioner Gordon", 75000, 1), 
-("Alfred", 50000, 3), 
-("Mayor", 80000, 4), 
-("Parks and Recreation Director", 65000, 5), 
-("Detective", 65000, 1), 
-("Engineer", 75000, 2), 
-("Accountant", 55000, 2), 
-("Legal Advisor", 70000, 2), 
-("Public Relations Specialist", 60000, 2);
+INSERT INTO role (title, salary, department_id)
+VALUES
+("Villain", 100000, 1),
+("Hero", 150000, 1),
+("Sidekick", 75000, 2),
+("Extra", 50000, 3),
+("Civilian", 35000, 4);
 
-INSERT INTO employees (first_name, last_name, role_id, manager_id) 
-VALUES 
-("Bruce", "Wayne", 1, NULL), 
-("Jim", "Gordon", 2, 1), 
-("Alfred", "Pennyworth", 5, 1), 
-("Harvey", "Dent", 2, 1), 
-("Barbara", "Gordon", 3, 1), 
-("Oliver", "Queen", 3, 1), 
-("Dinah", "Lance", 4, 1), 
-("Helena", "Bertinelli", 5, 1), 
-("Tim", "Drake", 3, 1), 
-("Cassandra", "Cain", 5, 1), 
-("Stephanie", "Brown", 1, 1), 
-("Carrie", "Kelley", 2, 1), 
-("Harleen", "Quinzel", 1, 1), 
-("Julie", "Madison", 5, 1), 
-("Vicki", "Vale", 4, 1), 
-("Rene", "Montoya", 4, 1), 
-("Detective", "Chase", 2, 1), 
-("Katana", "", 1, 1), 
-("Eduardo", "Dorian", 1, 1), 
-("Thomas", "Wayne Jr.", 5, 1);
-
-
+INSERT INTO employee (first_name, last_name, role_id, manager_id)
+VALUES
+("Clark", "Kent", 2, null),
+("Bruce", "Wayne", 2, null),
+("Diana", "Prince", 2, null),
+("Barry", "Allen", 2, null),
+("Arthur", "Curry", 2, null),
+("Lex", "Luthor", 1, null),
+("Joker", "", 1, null),
+("Harley", "Quinn", 1, null),
+("Deathstroke", "", 1, null),
+("Riddler", "", 1, null),
+("Catwoman", "", 1, null),
+("Raven", "", 3, 2),
+("Starfire", "", 3, 2),
+("Cyborg", "", 3, 2),
+("Beast Boy", "", 3, 2),
+("Nightwing", "", 3, 2),
+("Black Lightning", "", 4, 2),
+("Hawkman", "", 4, 2),
+("Metamorpho", "", 4, 2),
+("Katana", "", 4, 2),
+("Elongated Man", "", 4, 2),
+("Jimmy", "Olsen", 5, 2),
+("Lois", "Lane", 5, 2),
+("Perry", "White", 5, 2);

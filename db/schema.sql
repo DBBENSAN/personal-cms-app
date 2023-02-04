@@ -1,4 +1,5 @@
 DROP DATABASE IF EXISTS employee_db;
+
 CREATE database employee_db;
 
 USE employee_db;
@@ -27,5 +28,8 @@ FOREIGN KEY (role_id)
 REFERENCES roles(id),
 FOREIGN KEY (manager_id)
 REFERENCES employees(id) 
-ON UPDATE SET NULL
 );
+
+SHOW COLUMNS FROM department;
+SHOW COLUMNS FROM roles;
+SHOW COLUMNS FROM employees;

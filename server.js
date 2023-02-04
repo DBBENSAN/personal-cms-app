@@ -67,9 +67,12 @@ function helper(value) {
 };
 
 function viewEmployees(){
-    let query = `;`
-    db.query('', (err, res) =>{
-
+    let query = `SELECT * FROM employees;`
+    db.query(query, (err, res) => {
+        if(err) {
+            console.log(err)
+        }
+        console.table(res);
     })
 };
 

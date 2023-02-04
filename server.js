@@ -21,9 +21,9 @@ async function init() {
         message: "Select an action",
         choices:
             [
-                "View employees",
-                "View roles",
-                "View departments",
+                "View all departments",
+                "View all roles",
+                "View all employees",
                 "Add department",
                 "Add role",
                 "Add employee",
@@ -40,13 +40,13 @@ async function init() {
 };
 
 function helper(value) {
-    if (value === "View employees") {
+    if (value === "View all employees") {
         viewEmployees();
      }
-    if (value === "View roles") {
+    if (value === "View all roles") {
         viewRoles();
      }
-    if (value === "View departments") {
+    if (value === "View all departments") {
         viewDepartments();
      }
     if (value === "Add department") {
@@ -79,6 +79,35 @@ function viewEmployees(){
     JOIN role ON employee.role_id = role.id
     JOIN department ON role.department_id = department.id
     LEFT JOIN employee AS manager ON employee.manager_id = manager.id;`
+
+    db.query(query, (err, res) => {
+        if(err) {
+            console.log(err)
+        }
+        console.table(res);
+        init();
+    })
+};
+
+function viewRoles(){
+    let query = `
+    SELECT *
+    FROM role;`
+
+    db.query(query, (err, res) => {
+        if(err) {
+            console.log(err)
+        }
+        console.table(res);
+        init();
+    })
+};
+
+function viewDepartments(){
+    let query = `
+    SELECT *
+    FROM department;`
+
     db.query(query, (err, res) => {
         if(err) {
             console.log(err)

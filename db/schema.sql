@@ -1,15 +1,13 @@
 DROP DATABASE IF EXISTS employee_db;
-
 CREATE database employee_db;
-
 USE employee_db;
 
 CREATE TABLE department (
 id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-dept_name VARCHAR(30) NOT NULL
+name VARCHAR(30) NOT NULL
 );
 
-CREATE TABLE roles (
+CREATE TABLE role (
 id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
 title VARCHAR(30) NOT NULL,
 salary DECIMAL NOT NULL,
@@ -18,18 +16,17 @@ FOREIGN KEY (department_id)
 REFERENCES department(id)
 );
 
-CREATE TABLE employees (
+CREATE TABLE employee (
 id INT AUTO_INCREMENT PRIMARY KEY,
 first_name VARCHAR(30) NOT NULL,
 last_name VARCHAR(30) NOT NULL,
 role_id INT NOT NULL,
 manager_id INT,
 FOREIGN KEY (role_id)
-REFERENCES roles(id),
+REFERENCES role(id),
 FOREIGN KEY (manager_id)
-REFERENCES employees(id) 
+REFERENCES employee(id) 
 );
 
-SHOW COLUMNS FROM department;
-SHOW COLUMNS FROM roles;
-SHOW COLUMNS FROM employees;
+
+

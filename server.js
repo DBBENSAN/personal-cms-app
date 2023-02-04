@@ -67,17 +67,27 @@ function helper(value) {
 };
 
 function viewEmployees(){
-    let query = `SELECT * FROM employees;`
+    let query = `
+    SELECT employee.id AS "Employee ID",
+    employee.first_name AS "First Name",
+    employee.last_name AS "Last Name",
+    role.title AS "Job Title",
+    department.name AS "Department",
+    role.salary AS "Salary",
+    COALESCE(manager.id, 0) AS "Manager ID"
+    FROM employee
+    JOIN role ON employee.role_id = role.id
+    JOIN department ON role.department_id = department.id
+    LEFT JOIN employee AS manager ON employee.manager_id = manager.id;`
     db.query(query, (err, res) => {
         if(err) {
             console.log(err)
         }
         console.table(res);
+        init();
     })
 };
 
 
 
-
 init()
-

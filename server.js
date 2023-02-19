@@ -194,16 +194,48 @@ async function addRole(){
 };
 
 function editEmployee(){
-
-    let query = ``
-
-    db.query(query, (err, res) => {
-        if(err) {
-            console.log(err)
+    const prompt = [
+        {
+            name: "employee_id",
+            message: "Please provide the ID of the employee you want to edit",
+            validate: (input) => {
+                if (isNaN(input)) {
+                    console.log('\nPlease enter a valid ID');
+                    return false;
+                }
+                return true;
+            }
+        },
+        {
+            name: "new_salary",
+            message: "Please provide the new salary for this employee",
+            validate: (input) => {
+                if (isNaN(input)) {
+                    console.log('\nPlease enter a valid salary');
+                    return false;
+                }
+                return true;
+            }
         }
-        console.table(res);
-        init();
-    })
+    ];
+
+    inquirer.prompt(prompt).then((res) => {
+        console.log(res);
+        const { employee_id, new_salary } = res;
+
+        const sql = `UPDATE employees SET salary = ? WHERE id = ?`;
+        db.query(sql, [new_salary, employee_id], (err, res) => {
+            if (err) {
+                console.log(err);
+            }
+            console.log(`
+            =================
+            Employee Updated!
+            =================
+            `);
+            init();
+        });
+    });
 }
 
 

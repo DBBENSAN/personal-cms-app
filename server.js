@@ -239,6 +239,36 @@ function editEmployee(){
     });
 }
 
+async function deleteEmployee() {
+    try {
+      const { employee_id } = await inquirer.prompt({
+        name: "employee_id",
+        type: "input",
+        message: "Please provide the ID of the employee you want to delete: ",
+        validate: (input) => {
+          if (isNaN(input)) {
+            console.log("\nPlease enter a valid ID");
+            return false;
+          }
+          return true;
+        },
+      });
+  
+      const sql = "DELETE FROM employee WHERE id = ?";
+      await db.query(sql, [employee_id]);
+  
+      console.log(`
+      =================
+      Employee Deleted!
+      =================
+      `);
+  
+      init();
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
 
 
 

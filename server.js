@@ -1,5 +1,4 @@
-// Load dependancies
-const { Router } = require('express');
+
 const inquirer = require('inquirer')
 const mysql = require('mysql2');
 
@@ -150,17 +149,48 @@ async function addDepartment(){
     })
 };
 
-function addRole(){
-    
-    let query = ``
-
-    db.query(query, (err, res) => {
-        if(err) {
-            console.log(err)
+async function addRole(){
+    const prompt = [
+        {
+            name: "role",
+            message: "Please provide a role name",
+            validate: (input) => {
+                if (input.length > 30) {
+                    console.log('\nRole names are limited to 30 characters');
+                    return false;
+                }
+                return true;
+            }
+        },
+        {
+            name: "salary",
+            message: "Please provide a salary for this role",
+            validate: (input) => {
+                if (isNaN(input)) {
+                    console.log('\nPlease enter a valid salary');
+                    return false;
+                }
+                return true;
+            }
         }
-        console.table(res);
+    ];
+
+    const res = await inquirer.prompt(prompt);
+    console.log(res);
+    const { role, salary } = res;
+
+    const sql = `INSERT INTO roles (role_name, salary) VALUES (?, ?)`;
+    db.query(sql, [role, salary], (err, res) => {
+        if (err) {
+            console.log(err);
+        }
+        console.log(`
+        =================
+        Role Added!
+        =================
+        `);
         init();
-    })
+    });
 };
 
 function editEmployee(){

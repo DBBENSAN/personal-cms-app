@@ -67,17 +67,18 @@ function helper(value) {
 
 function viewEmployees(){
     const sql = `
-    SELECT employee.id AS "Employee ID",
-    employee.first_name AS "First Name",
-    employee.last_name AS "Last Name",
+    SELECT emp.id AS "Employee ID",
+    emp.first_name AS "First Name",
+    emp.last_name AS "Last Name",
     role.title AS "Job Title",
-    department.name AS "Department",
+    dept.name AS "Department",
     role.salary AS "Salary",
     COALESCE(manager.id, 0) AS "Manager ID"
-    FROM employee
-    JOIN role ON employee.role_id = role.id
-    JOIN department ON role.department_id = department.id
-    LEFT JOIN employee AS manager ON employee.manager_id = manager.id;`
+    FROM employee emp
+    JOIN role ON emp.role_id = role.id
+    JOIN department dept ON role.department_id = dept.id
+    LEFT JOIN employee manager ON emp.manager_id = manager.id
+    ORDER BY emp.id ASC;`
 
     db.query(sql, (err, res) => {
         if(err) {

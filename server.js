@@ -1,4 +1,3 @@
-
 const inquirer = require('inquirer')
 const mysql = require('mysql2');
 
@@ -41,31 +40,31 @@ async function init() {
 function helper(value) {
     if (value === "View all employees") {
         viewEmployees();
-     }
+    }
     if (value === "View all roles") {
         viewRoles();
-     }
+    }
     if (value === "View all departments") {
         viewDepartments();
-     }
+    }
     if (value === "Add department") {
         addDepartment();
-     }
+    }
     if (value === "Add role") {
         addRole()
-     }
+    }
     if (value === "Edit employee") {
         editEmployee()
-     }
+    }
     if (value === "Remove employee") {
         removeEmployee()
-     }
+    }
     if (value === "EXIT") {
         closeOut()
-     }
+    }
 };
 
-function viewEmployees(){
+function viewEmployees() {
     const sql = `
     SELECT emp.id AS "Employee ID",
     emp.first_name AS "First Name",
@@ -81,7 +80,7 @@ function viewEmployees(){
     ORDER BY emp.id ASC;`
 
     db.query(sql, (err, res) => {
-        if(err) {
+        if (err) {
             console.log(err)
         }
         console.table(res);
@@ -89,13 +88,13 @@ function viewEmployees(){
     })
 };
 
-function viewRoles(){
+function viewRoles() {
     let sql = `
     SELECT *
     FROM role;`
 
     db.query(sql, (err, res) => {
-        if(err) {
+        if (err) {
             console.log(err)
         }
         console.table(res);
@@ -103,13 +102,13 @@ function viewRoles(){
     })
 };
 
-function viewDepartments(){
+function viewDepartments() {
     let sql = `
     SELECT *
     FROM department;`
 
     db.query(sql, (err, res) => {
-        if(err) {
+        if (err) {
             console.log(err)
         }
         console.table(res);
@@ -117,18 +116,18 @@ function viewDepartments(){
     })
 };
 
-async function addDepartment(){
+async function addDepartment() {
     const prompt = [
         {
-        name: "dept",
-        message: "Please provide a department name",
-        validate: (input) => {
-            if(input.length > 30){
-                console.log('\nDept. Names are limited to 30 Characters');
-                return false;
+            name: "dept",
+            message: "Please provide a department name",
+            validate: (input) => {
+                if (input.length > 30) {
+                    console.log('\nDept. Names are limited to 30 Characters');
+                    return false;
+                }
+                return true;
             }
-            return true;
-        }
         }
     ];
 
@@ -138,7 +137,7 @@ async function addDepartment(){
 
     const sql = `INSERT INTO department (name) VALUES (?)`
     db.query(sql, params, (err, res) => {
-        if(err) {
+        if (err) {
             console.log(err)
         }
         console.log(`
@@ -150,7 +149,7 @@ async function addDepartment(){
     })
 };
 
-async function addRole(){
+async function addRole() {
     const prompt = [
         {
             name: "role",
@@ -173,15 +172,26 @@ async function addRole(){
                 }
                 return true;
             }
+        },
+        {
+            name: "department_id",
+            message: "Please provide the department ID for this role",
+            validate: (input) => {
+                if (isNaN(input)) {
+                    console.log('\nPlease enter a valid department ID');
+                    return false;
+                }
+                return true;
+            }
         }
     ];
 
     const res = await inquirer.prompt(prompt);
     console.log(res);
-    const { role, salary } = res;
+    const { role, salary, department_id } = res;
 
-    const sql = `INSERT INTO roles (role_name, salary) VALUES (?, ?)`;
-    db.query(sql, [role, salary], (err, res) => {
+    const sql = `INSERT INTO role (title, salary, department_id) VALUES (?, ?, ?)`;
+    db.query(sql, [role, salary, department_id], (err, res) => {
         if (err) {
             console.log(err);
         }
@@ -194,81 +204,89 @@ async function addRole(){
     });
 };
 
-function editEmployee(){
-    const prompt = [
-        {
-            name: "employee_id",
-            message: "Please provide the ID of the employee you want to edit",
-            validate: (input) => {
-                if (isNaN(input)) {
-                    console.log('\nPlease enter a valid ID');
-                    return false;
-                }
-                return true;
-            }
-        },
-        {
-            name: "new_salary",
-            message: "Please provide the new salary for this employee",
-            validate: (input) => {
-                if (isNaN(input)) {
-                    console.log('\nPlease enter a valid salary');
-                    return false;
-                }
-                return true;
-            }
-        }
-    ];
 
-    inquirer.prompt(prompt).then((res) => {
+async function editEmployee() {
+    try {
+        const prompt = [
+            {
+                name: "employee_id",
+                message: "Please provide the ID of the employee you want to edit",
+                validate: (input) => {
+                    if (isNaN(input)) {
+                        console.log('\nPlease enter a valid ID');
+                        return false;
+                    }
+                    return true;
+                }
+            },
+            {
+                name: "new_salary",
+                message: "Please provide the new salary for this employee",
+                validate: (input) => {
+                    if (isNaN(input)) {
+                        console.log('\nPlease enter a valid salary');
+                        return false;
+                    }
+                    return true;
+                }
+            }
+        ];
+
+        const res = await inquirer.prompt(prompt);
         console.log(res);
         const { employee_id, new_salary } = res;
 
         const sql = `UPDATE employees SET salary = ? WHERE id = ?`;
-        db.query(sql, [new_salary, employee_id], (err, res) => {
-            if (err) {
-                console.log(err);
-            }
-            console.log(`
-            =================
-            Employee Updated!
-            =================
-            `);
-            init();
-        });
-    });
+        const result = await db.query(sql, [new_salary, employee_id]);
+        console.log(`
+        =================
+        Employee Updated!
+        =================
+      `);
+        init();
+    } catch (err) {
+        console.log(err);
+    }
 }
 
 async function deleteEmployee() {
     try {
-      const { employee_id } = await inquirer.prompt({
-        name: "employee_id",
-        type: "input",
-        message: "Please provide the ID of the employee you want to delete: ",
-        validate: (input) => {
-          if (isNaN(input)) {
-            console.log("\nPlease enter a valid ID");
-            return false;
-          }
-          return true;
-        },
-      });
-  
-      const sql = "DELETE FROM employee WHERE id = ?";
-      await db.query(sql, [employee_id]);
-  
-      console.log(`
+        const { employee_id } = await inquirer.prompt({
+            name: "employee_id",
+            type: "input",
+            message: "Please provide the ID of the employee you want to delete: ",
+            validate: (input) => {
+                if (isNaN(input)) {
+                    console.log("\nPlease enter a valid ID");
+                    return false;
+                }
+                return true;
+            },
+        });
+
+        const sql = "DELETE FROM employee WHERE id = ?";
+        await db.query(sql, [employee_id]);
+
+        console.log(`
       =================
       Employee Deleted!
       =================
       `);
-  
-      init();
-    } catch (error) {
-      console.log(error);
-    }
-  }
 
+        init();
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+
+function closeOut(){
+    console.log(`
+.▀█▀.█▄█.█▀█.█▄.█.█▄▀　█▄█.█▀█.█─█
+─.█.─█▀█.█▀█.█.▀█.█▀▄　─█.─█▄█.█▄█
+    
+    `)
+}
 
 
 

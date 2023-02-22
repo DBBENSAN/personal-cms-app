@@ -24,9 +24,9 @@ async function init() {
                 "View all employees",
                 "Add department",
                 "Add role",
-                "Add employee",
+                "Add Employee",
                 "Edit employee",
-                "Remove employee",
+                // "Remove employee",
                 "EXIT"
             ]
     }]
@@ -39,10 +39,10 @@ async function init() {
 
 function helper(value) {
     if (value === "View all employees") {
-        viewEmployees();
+        getAllEmployees();
     }
     if (value === "View all roles") {
-        viewRoles();
+        getAllRoles();
     }
     if (value === "View all departments") {
         viewDepartments();
@@ -56,15 +56,15 @@ function helper(value) {
     if (value === "Edit employee") {
         editEmployee()
     }
-    if (value === "Remove employee") {
-        removeEmployee()
+    if (value === "Add Employee") {
+        addEmployee()
     }
     if (value === "EXIT") {
         closeOut()
     }
 };
 
-function viewEmployees() {
+function getAllEmployees() {
     const sql = `
     SELECT emp.id AS "Employee ID",
     emp.first_name AS "First Name",
@@ -88,7 +88,7 @@ function viewEmployees() {
     })
 };
 
-function viewRoles() {
+function getAllRoles() {
     let sql = `
     SELECT *
     FROM role;`
@@ -205,82 +205,97 @@ async function addRole() {
 };
 
 
-async function editEmployee() {
-    try {
-        const prompt = [
-            {
-                name: "employee_id",
-                message: "Please provide the ID of the employee you want to edit",
-                validate: (input) => {
-                    if (isNaN(input)) {
-                        console.log('\nPlease enter a valid ID');
-                        return false;
-                    }
-                    return true;
-                }
-            },
-            {
-                name: "new_salary",
-                message: "Please provide the new salary for this employee",
-                validate: (input) => {
-                    if (isNaN(input)) {
-                        console.log('\nPlease enter a valid salary');
-                        return false;
-                    }
-                    return true;
-                }
-            }
-        ];
 
-        const res = await inquirer.prompt(prompt);
-        console.log(res);
-        const { employee_id, new_salary } = res;
 
-        const sql = `UPDATE employees SET salary = ? WHERE id = ?`;
-        const result = await db.query(sql, [new_salary, employee_id]);
-        console.log(`
-        =================
-        Employee Updated!
-        =================
-      `);
-        init();
-    } catch (err) {
-        console.log(err);
-    }
-}
-
-async function deleteEmployee() {
-    try {
-        const { employee_id } = await inquirer.prompt({
-            name: "employee_id",
-            type: "input",
-            message: "Please provide the ID of the employee you want to delete: ",
+async function addEmployee() {
+    const roles = await getRoles();
+    const managers = await getManagers();
+    const prompt = [
+        {
+            name: "first_name",
+            message: "Please provide the employee's first name",
             validate: (input) => {
-                if (isNaN(input)) {
-                    console.log("\nPlease enter a valid ID");
+                if (input.length > 30) {
+                    console.log('\nEmployee names are limited to 30 characters');
                     return false;
                 }
                 return true;
-            },
-        });
+            }
+        },
+        {
+            name: "last_name",
+            message: "Please provide the employee's last name",
+            validate: (input) => {
+                if (input.length > 30) {
+                    console.log('\nEmployee names are limited to 30 characters');
+                    return false;
+                }
+                return true;
+            }
+        },
+        {
+            name: "role_id",
+            type: "list",
+            message: "Please select the employee's role",
+            choices: roles.map(role => ({
+                name: role.title,
+                value: role.id
+            }))
+        },
+        {
+            name: "manager_id",
+            type: "list",
+            message: "Please select the employee's manager",
+            choices: managers.map(manager => ({
+                name: `${manager.first_name} ${manager.last_name}`,
+                value: manager.id
+            }))
+        }
+    ];
 
-        const sql = "DELETE FROM employee WHERE id = ?";
-        await db.query(sql, [employee_id]);
+    const res = await inquirer.prompt(prompt);
+    console.log(res);
+    const { first_name, last_name, role_id, manager_id } = res;
 
+    const sql = `INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES (?, ?, ?, ?)`;
+    db.query(sql, [first_name, last_name, role_id, manager_id], (err, res) => {
+        if (err) {
+            console.log(err);
+        }
         console.log(`
-      =================
-      Employee Deleted!
-      =================
-      `);
-
+        =================
+        Employee Added!
+        =================
+        `);
         init();
-    } catch (error) {
-        console.log(error);
-    }
+    });
+};
+
+async function getRoles() {
+    const sql = `SELECT * FROM role;`
+    return new Promise((resolve, reject) => {
+        db.query(sql, (err, res) => {
+            if (err) {
+                reject(err);
+            }
+            resolve(res);
+        });
+    });
 }
 
+async function getManagers() {
+    const sql = `SELECT * FROM employee WHERE manager_id IS NULL;`
+    return new Promise((resolve, reject) => {
+        db.query(sql, (err, res) => {
+            if (err) {
+                reject(err);
+            }
+            resolve(res);
+        });
+    });
+}
 
-function closeOut(){
+function closeOut() {
     console.log(`
 .▀█▀.█▄█.█▀█.█▄.█.█▄▀　█▄█.█▀█.█─█
 ─.█.─█▀█.█▀█.█.▀█.█▀▄　─█.─█▄█.█▄█

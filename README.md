@@ -1,10 +1,42 @@
+# Employee Tracker CLI App
 
-## Employee Tracker
+The Employee Tracker is a Command Line Interface (CLI) application that allows users to manage employees, departments, and roles in a company. With this application, users can add, view, update, and delete employees, departments, and roles, as well as generate reports on employee information.
+
+## Table of Contents
+
+  - [Features](#features)
+  - [Installation](#installation)
+  - [Usage](#usage)
+  - [Technologies Used](#technologies-used)
+  - [Contributing](#contributing)
+  - [Demo](#demo)
+  - [Badges](#badges)
 
 
-## Lessons Learned
+## Features
 
+- View all employees, departments, and roles
+- Add new employees, departments, and roles
+- Update employee roles and manager
+- Delete employees, departments, and roles - TBD!!!
+- View employees by department or manager
+- Generate a report on employee information, including their roles, salaries, and managers
 
+## Installation
+
+```
+To install the Employee Tracker, simply clone this repository and install the required dependencies using npm.
+$ git clone https://github.com/your-username/employee-tracker.git
+$ cd employee-tracker
+$ npm install
+```
+
+## Usage
+
+To use the Employee Tracker, run the following command in your terminal:
+```
+$ node index.js
+```
 
 ## Technologies Used
 
@@ -19,7 +51,9 @@
 | `MySQL 2` | `https://www.npmjs.com/package/mysql2` | 
 
 
+## Contributing
 
+Contributions are welcome! If you have any suggestions or would like to report a bug, please create a GitHub issue or submit a pull request.
 
 ## Demo
 

@@ -204,8 +204,80 @@ async function addRole() {
     });
 };
 
+async function editEmployee() {
+    // Get list of employees
+    const employees = await getEmployees();
 
+    // Prompt user to select employee to edit
+    const employeeChoices = employees.map(({ id, first_name, last_name }) => ({
+        name: `${first_name} ${last_name}`,
+        value: id,
+    }));
+    const { employee_id } = await inquirer.prompt({
+        type: 'list',
+        name: 'employee_id',
+        message: 'Which employee would you like to edit?',
+        choices: employeeChoices,
+    });
 
+    // Get selected employee's current data
+    const employeeSql = `
+   SELECT
+     e.id,
+     e.first_name,
+     e.last_name,
+     e.role_id,
+     e.manager_id
+   FROM employee e
+   WHERE e.id = ?;
+ `;
+    const [employee] = await db.promise().query(employeeSql, [employee_id]);
+
+    // Get list of roles and prompt user to select new role
+    const roles = await getRoles();
+    const roleChoices = roles.map(({ id, title }) => ({ name: title, value: id }));
+    const { role_id } = await inquirer.prompt({
+        type: 'list',
+        name: 'role_id',
+        message: 'Which role would you like to assign to this employee?',
+        choices: roleChoices,
+        default: roles.findIndex((r) => r.id === employee.role_id),
+    });
+
+    // Get list of managers and prompt user to select new manager
+    const managerChoices = [
+        { name: 'None', value: null },
+        ...employees
+            .filter((e) => e.id !== employee_id)
+            .map(({ id, first_name, last_name }) => ({
+                name: `${first_name} ${last_name}`,
+                value: id,
+            })),
+    ];
+    const { manager_id } = await inquirer.prompt({
+        type: 'list',
+        name: 'manager_id',
+        message: 'Which manager would you like to assign to this employee?',
+        choices: managerChoices,
+        default: managerChoices.findIndex((m) => m.value === employee.manager_id),
+    });
+
+    // Update employee data in database
+    const updateSql = `
+   UPDATE employee
+   SET role_id = ?, manager_id = ?
+   WHERE id = ?;
+ `;
+    await db.promise().query(updateSql, [role_id, manager_id, employee_id]);
+
+    console.log(`
+   =================
+   Employee Updated!
+   =================
+ `);
+
+    init();
+}
 
 async function addEmployee() {
     const roles = await getRoles();
@@ -270,6 +342,22 @@ async function addEmployee() {
         init();
     });
 };
+
+async function getEmployees() {
+    const sql = `SELECT e.id, e.first_name, e.last_name, r.title, d.name AS department, r.salary, CONCAT(m.first_name, ' ', m.last_name) AS manager
+                 FROM employee e
+                 LEFT JOIN role r ON e.role_id = r.id
+                 LEFT JOIN department d ON r.department_id = d.id
+                 LEFT JOIN employee m ON e.manager_id = m.id`;
+    return new Promise((resolve, reject) => {
+      db.query(sql, (err, res) => {
+        if (err) {
+          reject(err);
+        }
+        resolve(res);
+      });
+    });
+  }
 
 async function getRoles() {
     const sql = `SELECT * FROM role;`

@@ -26,7 +26,7 @@ The Employee Tracker is a Command Line Interface (CLI) application that allows u
 
 ```
 To install the Employee Tracker, simply clone this repository and install the required dependencies using npm.
-$ git clone https://github.com/your-username/employee-tracker.git
+$ git clone https://github.com/DBBENSAN/employee-tracker.git
 $ cd employee-tracker
 $ npm install
 ```

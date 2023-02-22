@@ -35,7 +35,7 @@ $ npm install
 
 To use the Employee Tracker, run the following command in your terminal:
 ```
-$ node index.js
+$ node server.js
 ```
 
 ## Technologies Used

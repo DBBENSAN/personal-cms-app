@@ -222,15 +222,17 @@ async function editEmployee() {
 
     // Get selected employee's current data
     const employeeSql = `
-   SELECT
-     e.id,
-     e.first_name,
-     e.last_name,
-     e.role_id,
-     e.manager_id
-   FROM employee e
-   WHERE e.id = ?;
- `;
+        SELECT
+            e.id,
+            e.first_name,
+            e.last_name,
+            e.role_id,
+            e.manager_id,
+            r.salary
+        FROM employee e
+        JOIN role r ON e.role_id = r.id
+        WHERE e.id = ?;
+    `;
     const [employee] = await db.promise().query(employeeSql, [employee_id]);
 
     // Get list of roles and prompt user to select new role
@@ -242,6 +244,14 @@ async function editEmployee() {
         message: 'Which role would you like to assign to this employee?',
         choices: roleChoices,
         default: roles.findIndex((r) => r.id === employee.role_id),
+    });
+
+    // Prompt user to enter new salary
+    const { newSalary } = await inquirer.prompt({
+        type: 'input',
+        name: 'newSalary',
+        message: `What is the new salary for this employee?`,
+        default: employee.salary,
     });
 
     // Get list of managers and prompt user to select new manager
@@ -264,20 +274,28 @@ async function editEmployee() {
 
     // Update employee data in database
     const updateSql = `
-   UPDATE employee
-   SET role_id = ?, manager_id = ?
-   WHERE id = ?;
- `;
+        UPDATE employee
+        SET role_id = ?, manager_id = ?
+        WHERE id = ?;
+    `;
     await db.promise().query(updateSql, [role_id, manager_id, employee_id]);
 
-    console.log(`
-   =================
-   Employee Updated!
-   =================
- `);
+    // Update employee's salary in database
+    const updateSalarySql = `
+        UPDATE role
+        SET salary = ?
+        WHERE id = ?;
+    `;
+    await db.promise().query(updateSalarySql, [newSalary, role_id]);
 
+    console.log(`
+        =================
+        Employee Updated!
+        =================
+    `);
     init();
 }
+
 
 async function addEmployee() {
     const roles = await getRoles();
